@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title>Чек-лист цифровой защиты</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -140,9 +141,9 @@ footer p { margin: 0 0 6px; }
       <ul class="how">
         <li class="gen" data-p="mac"><strong>1.</strong> Откройте «Терминал»: Command + Пробел, напишите «Терминал», нажмите Enter.</li>
         <li class="gen" data-p="mac"><strong>2.</strong> Скопируйте эту строку, вставьте её в «Терминал» (Command + V) и нажмите Enter:
-          <span class="cmd"><input id="cmd" readonly value='zsh -c "$(curl -fsSL https://gist.githubusercontent.com/GudvinAO/f154844d3c992169f5162f06eb4cb884/raw/ustanovka-mac.txt)"' aria-label="Команда для Терминала"><button type="button" class="btn ghost" data-copy="cmd">Скопировать</button></span></li>
+          <span class="cmd"><input id="cmd" readonly value='zsh -c "$(curl -fsSL https://gist.githubusercontent.com/GudvinAO/fc2ae0802ac3210ad5d61cd3bdef7a28/raw/ustanovka-mac.txt)"' aria-label="Команда для Терминала"><button type="button" class="btn ghost" data-copy="cmd">Скопировать</button></span></li>
         <li class="gen" data-p="mac"><strong>3.</strong> На каждый вопрос отвечайте <code>1</code> (да) или <code>2</code> (нет) и нажимайте Enter.</li>
-        <li class="gen" data-p="mac">Строка скачивает программу и запускает её. Программа ставит только с официальных сайтов и проверяет подпись разработчика. Пароль она не спрашивает и без ответа «1» ничего не ставит. Это обычный текст, его можно <a href="https://gist.github.com/GudvinAO/f154844d3c992169f5162f06eb4cb884" target="_blank" rel="noopener">прочитать</a>. Запускайте только строку с этой страницы: команды от незнакомых людей не запускайте никогда.</li>
+        <li class="gen" data-p="mac">Строка скачивает программу и запускает её. Программа ставит только с официальных сайтов и проверяет подпись разработчика. Пароль она не спрашивает и без ответа «1» ничего не ставит. Это обычный текст, его можно <a href="https://gist.github.com/GudvinAO/fc2ae0802ac3210ad5d61cd3bdef7a28" target="_blank" rel="noopener">прочитать</a>. Запускайте только строку с этой страницы: команды от незнакомых людей не запускайте никогда.</li>
       </ul>
     </article>
 
@@ -160,8 +161,8 @@ footer p { margin: 0 0 6px; }
 Сначала спроси, какие у меня устройства: Mac, iPhone, iPad.
 
 MAC. Всё делает программа установки: по очереди предлагает программы с объяснением, ставит последние версии с официальных сайтов с проверкой подписи разработчика, проверяет настройки Mac и открывает нужные окна. Открыть «Терминал» (Command + Пробел, написать «Терминал», Enter), вставить строку и нажать Enter:
-zsh -c "$(curl -fsSL https://gist.githubusercontent.com/GudvinAO/f154844d3c992169f5162f06eb4cb884/raw/ustanovka-mac.txt)"
-На вопросы отвечать 1 (да) или 2 (нет). Пароль программа не спрашивает. Прочитать её можно здесь: https://gist.github.com/GudvinAO/f154844d3c992169f5162f06eb4cb884
+zsh -c "$(curl -fsSL https://gist.githubusercontent.com/GudvinAO/fc2ae0802ac3210ad5d61cd3bdef7a28/raw/ustanovka-mac.txt)"
+На вопросы отвечать 1 (да) или 2 (нет). Пароль программа не спрашивает. Прочитать её можно здесь: https://gist.github.com/GudvinAO/fc2ae0802ac3210ad5d61cd3bdef7a28
 Что предлагает: Proton VPN и защитный DNS Quad9 (рекомендую; если уже стоит NextDNS, Quad9 не нужен), Signal, Tailscale и Actual для бюджета (по желанию), LuLu (для опытных). Actual сам не обновляется: чтобы обновить, программу запускают ещё раз.
 
 IPHONE И IPAD, через App Store: Proton VPN; Signal и Tailscale по желанию. Quad9: в Safari открыть docs.quad9.net → iOS 14 and later (Encrypted) → «Recommended: HTTPS (.9)», затем Настройки → «Профиль загружен» → Установить.
