@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Чек-лист цифровой защиты</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=PT+Serif:wght@700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: one reading column; checklist cards grouped by stage; device filter narrows the steps */
+:root {
+  --bg: #F2F6F7;
+  --surface: #FFFFFF;
+  --ink: #15232B;
+  --muted: #536670;
+  --line: #D4DFE3;
+  --accent: #0E6B66;
+  --on-accent: #FFFFFF;
+  --done: #1D7A42;
+  --warn: #8A5200;
+  --warn-soft: #FFF1DB;
+  --display: "PT Serif", Georgia, "Times New Roman", serif;
+  --body: "Golos Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1619; --surface: #162126; --ink: #E3ECEF; --muted: #93A7AF; --line: #283A42;
+    --accent: #52C3B9; --on-accent: #08201E; --done: #5CCF8B; --warn: #F2B45E; --warn-soft: #34270F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1619; --surface: #162126; --ink: #E3ECEF; --muted: #93A7AF; --line: #283A42;
+  --accent: #52C3B9; --on-accent: #08201E; --done: #5CCF8B; --warn: #F2B45E; --warn-soft: #34270F;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); }
+.wrap {
+  max-width: 760px; margin: 0 auto; display: grid; gap: 44px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+}
+header { display: grid; gap: 16px; }
+.eyebrow { margin: 0; font: 500 0.78rem/1.3 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+h1 { margin: 0; font: 700 clamp(2rem, 6vw, 2.8rem)/1.1 var(--display); text-wrap: balance; }
+.lede { margin: 0; max-width: 62ch; color: var(--muted); font-size: 1.05rem; }
+.progress { display: grid; gap: 6px; }
+.bar { height: 8px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.bar span { display: block; height: 100%; width: 0; background: var(--done); transition: width .3s ease; }
+#count { margin: 0; font: 500 0.85rem/1.3 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.filter { display: flex; flex-wrap: wrap; gap: 8px; }
+.filter button {
+  font: 500 0.92rem/1 var(--body); color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; cursor: pointer;
+}
+.filter button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+section { display: grid; gap: 14px; }
+h2 { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; font: 700 1.45rem/1.25 var(--display); text-wrap: balance; }
+.time { font: 500 0.8rem/1.3 var(--mono); color: var(--muted); }
+.note { margin: -4px 0 0; color: var(--muted); max-width: 62ch; }
+.item {
+  display: grid; gap: 10px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px;
+}
+.item:has(input:checked) { border-color: var(--done); }
+.item:has(input:checked) .head span { color: var(--done); }
+.head { display: flex; gap: 12px; align-items: flex-start; font-weight: 600; font-size: 1.08rem; line-height: 1.35; cursor: pointer; }
+.head input { flex: none; width: 22px; height: 22px; margin: 0; accent-color: var(--done); cursor: pointer; }
+.why, .how { margin: 0 0 0 34px; }
+.why { color: var(--muted); }
+.how { padding: 0; list-style: none; display: grid; gap: 8px; }
+.how li { display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 12px; padding-top: 8px; border-top: 1px solid var(--line); }
+.how li.gen { display: block; }
+.how b { font: 500 0.76rem/1.6 var(--mono); letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
+.how li span, .how li.gen { min-width: 0; overflow-wrap: anywhere; }
+a { color: var(--accent); text-underline-offset: 3px; }
+.alert { background: var(--warn-soft); border-radius: 10px; padding: 22px 20px; }
+.alert h2 { color: var(--warn); }
+.plain { margin: 0; padding-left: 20px; display: grid; gap: 10px; max-width: 64ch; }
+.card-title { margin: 0; font-weight: 600; font-size: 1.08rem; line-height: 1.35; }
+.btn { font: 600 1rem/1 var(--body); color: var(--on-accent); background: var(--accent); border: 1px solid var(--accent); border-radius: 8px; padding: 12px 18px; cursor: pointer; }
+.btn.ghost { color: var(--accent); background: transparent; font-size: 0.92rem; padding: 9px 14px; }
+.cmd { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.cmd input, .cmd textarea { flex: 1 1 220px; min-width: 0; font: 500 0.9rem/1.2 var(--mono); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.cmd textarea { flex-basis: 100%; font-size: 0.82rem; line-height: 1.45; resize: vertical; }
+footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--line); padding-top: 16px; }
+footer p { margin: 0 0 6px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 540px) {
+  .how li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .why, .how { margin-left: 0; }
+  .item { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .bar span { transition: none; } }
+</style>
+</head>
+<body>
+
+<main class="wrap">
+  <header>
+    <p class="eyebrow">Для тех, кто работает с данными клиентов</p>
+    <h1>Чек-лист цифровой защиты</h1>
+    <p class="lede">Двенадцать шагов, которые закрывают почти все реальные утечки: поддельные письма, одинаковые пароли, потерянный телефон. На всё уходит около часа. Отмечайте сделанное, галочки сохраняются в этом браузере.</p>
+    <div class="progress" aria-live="polite">
+      <div class="bar"><span id="bar"></span></div>
+      <p id="count">Сделано 0 из 12</p>
+    </div>
+    <div class="filter" role="group" aria-label="Показать шаги для устройства">
+      <button type="button" id="f-all" data-f="all" aria-pressed="true">Все устройства</button>
+      <button type="button" id="f-iphone" data-f="iphone" aria-pressed="false">iPhone</button>
+      <button type="button" id="f-android" data-f="android" aria-pressed="false">Android</button>
+      <button type="button" id="f-mac" data-f="mac" aria-pressed="false">Mac</button>
+      <button type="button" id="f-windows" data-f="windows" aria-pressed="false">Windows</button>
+    </div>
+  </header>
+
+  <section>
+    <h2>Установка программ <span class="time">≈ 15 минут</span></h2>
+    <p class="note">Пароли и коды входа храните во встроенном приложении «Пароли» на iPhone, iPad и Mac: для этого ничего ставить не нужно.</p>
+
+    <article class="item">
+      <h3 class="card-title">Что ставим и зачем</h3>
+      <ul class="how">
+        <li><b>Proton VPN</b><span><strong>Рекомендую.</strong> Прячет, какие сайты вы открываете, от владельца чужого Wi-Fi: кафе, отель, вокзал. Бесплатно.</span></li>
+        <li><b>Quad9</b><span><strong>Рекомендую.</strong> Защитный DNS: не пускает на мошеннические и заражённые сайты. Бесплатно, без регистрации. Если уже стоит NextDNS, не нужен.</span></li>
+        <li><b>Signal</b><span>По желанию. Защищённые сообщения и звонки.</span></li>
+        <li><b>Tailscale</b><span>По желанию. Доступ к своим же устройствам издалека. Интернет не прячет.</span></li>
+        <li><b>LuLu</b><span>Для опытных, только Mac. Спрашивает разрешение на каждое соединение с интернетом.</span></li>
+        <li><b>Actual</b><span>По желанию, только Mac. Личный бюджет: доходы, расходы, план. Бюджет хранится на вашем Маке, а не в чужом облаке. Сам не обновляется: запустите программу установки ещё раз, и она предложит новую версию.</span></li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <h3 class="card-title">Mac: программа установки</h3>
+      <p class="why">Предложит каждую программу по очереди и объяснит, зачем она. Потом проверит обновления, шифрование, блокировку экрана и брандмауэр и откроет нужные окна настроек.</p>
+      <ul class="how">
+        <li class="gen" data-p="mac"><strong>1.</strong> Откройте «Терминал»: Command + Пробел, напишите «Терминал», нажмите Enter.</li>
+        <li class="gen" data-p="mac"><strong>2.</strong> Скопируйте эту строку, вставьте её в «Терминал» (Command + V) и нажмите Enter:
+          <span class="cmd"><input id="cmd" readonly value='zsh -c "$(curl -fsSL https://gist.githubusercontent.com/GudvinAO/f154844d3c992169f5162f06eb4cb884/raw/ustanovka-mac.txt)"' aria-label="Команда для Терминала"><button type="button" class="btn ghost" data-copy="cmd">Скопировать</button></span></li>
+        <li class="gen" data-p="mac"><strong>3.</strong> На каждый вопрос отвечайте <code>1</code> (да) или <code>2</code> (нет) и нажимайте Enter.</li>
+        <li class="gen" data-p="mac">Строка скачивает программу и запускает её. Программа ставит только с официальных сайтов и проверяет подпись разработчика. Пароль она не спрашивает и без ответа «1» ничего не ставит. Это обычный текст, его можно <a href="https://gist.github.com/GudvinAO/f154844d3c992169f5162f06eb4cb884" target="_blank" rel="noopener">прочитать</a>. Запускайте только строку с этой страницы: команды от незнакомых людей не запускайте никогда.</li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <h3 class="card-title">Помощник в ChatGPT</h3>
+      <p class="why">Если удобнее, чтобы по шагам вёл ИИ, скопируйте этот текст и вставьте его в новый чат ChatGPT. Хватит и бесплатного тарифа. Помощник проведёт по этой памятке и ответит на вопросы. Чтобы он всегда был под рукой, создайте в ChatGPT проект и вставьте текст в его инструкции.</p>
+      <ul class="how">
+        <li class="gen"><span class="cmd"><textarea id="prompt" readonly rows="8" aria-label="Текст для ChatGPT">Ты — помощник по цифровой защите для финансового консультанта в Чехии. Ведёшь меня по памятке коллеги. Отвечай по-русски, простыми словами, по одному шагу, и жди моего ответа.
+
+Правила:
+— Никогда не проси пароли, коды, номера карт и данные клиентов. Если я начну их писать, останови меня.
+— Не советуй других программ и сервисов, кроме перечисленных ниже, и не давай других команд для Терминала, кроме одной ниже.
+— Если не знаешь, как называется пункт меню в моей версии, так и скажи и попроси скриншот.
+
+Сначала спроси, какие у меня устройства: Mac, iPhone, iPad.
+
+MAC. Всё делает программа установки: по очереди предлагает программы с объяснением, ставит последние версии с официальных сайтов с проверкой подписи разработчика, проверяет настройки Mac и открывает нужные окна. Открыть «Терминал» (Command + Пробел, написать «Терминал», Enter), вставить строку и нажать Enter:
+zsh -c "$(curl -fsSL https://gist.githubusercontent.com/GudvinAO/f154844d3c992169f5162f06eb4cb884/raw/ustanovka-mac.txt)"
+На вопросы отвечать 1 (да) или 2 (нет). Пароль программа не спрашивает. Прочитать её можно здесь: https://gist.github.com/GudvinAO/f154844d3c992169f5162f06eb4cb884
+Что предлагает: Proton VPN и защитный DNS Quad9 (рекомендую; если уже стоит NextDNS, Quad9 не нужен), Signal, Tailscale и Actual для бюджета (по желанию), LuLu (для опытных). Actual сам не обновляется: чтобы обновить, программу запускают ещё раз.
+
+IPHONE И IPAD, через App Store: Proton VPN; Signal и Tailscale по желанию. Quad9: в Safari открыть docs.quad9.net → iOS 14 and later (Encrypted) → «Recommended: HTTPS (.9)», затем Настройки → «Профиль загружен» → Установить.
+
+Потом пройди со мной памятку:
+1. Пароли — во встроенном приложении «Пароли», у каждого сервиса свой. Начать с почты, банка и рабочих систем.
+2. Вход с подтверждением. Коды тоже в «Пароли»: в сервисе выбрать «Приложение-аутентификатор» и показать QR-код, на iPhone: «Пароли» → аккаунт → «Настроить код проверки». SMS — только если иначе нельзя: SIM-карту могут перевыпустить мошенники. Telegram — облачный пароль, WhatsApp — двухшаговая проверка. Резервные коды — в «Пароли».
+3. Автообновления на iPhone и Mac.
+4. Код на iPhone из 6 цифр и больше, автоблокировка 30 секунд или 1 минута. На Mac пароль сразу или через 1 минуту.
+5. FileVault на Mac, ключ восстановления — в «Пароли».
+6. Резервная копия: Time Machine на внешний диск плюс iCloud. Для документов клиентов — «Расширенная защита данных» в iCloud.
+7. VPN в чужом Wi-Fi.
+8. Проверка утечек: haveibeenpwned.com, подписаться на уведомления.
+9. Документы клиентов — только в рабочих системах. Файлы — ссылкой с паролем, пароль отдельно. Срочность и деньги в звонке или письме — повод остановиться и перезвонить по официальному номеру.
+10. ChatGPT: включить вход с кодом (Настройки → Безопасность), выключить «Улучшить модель для всех» (Настройки → Управление данными). Не вставлять имена, rodné číslo, номера счетов, договоры и сканы клиентов. Личные тарифы (Free, Plus, Pro) без договора об обработке данных по GDPR.
+
+В конце коротко перечисли, что сделано и что осталось.</textarea><button type="button" class="btn ghost" data-copy="prompt">Скопировать текст</button></span></li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <h3 class="card-title">iPhone и iPad: по ссылкам</h3>
+      <p class="why">Телефон не разрешает программам ставить приложения, поэтому здесь прямые ссылки в App Store.</p>
+      <ul class="how">
+        <li data-p="iphone"><b>Proton VPN</b><span><a href="https://apps.apple.com/cz/app/proton-vpn-fast-secure/id1437005085" target="_blank" rel="noopener">Открыть в App Store</a>. После установки войдите и разрешите добавить VPN.</span></li>
+        <li data-p="iphone"><b>Quad9</b><span><a href="https://docs.quad9.net/Setup_Guides/iOS/iOS_14_and_later_(Encrypted)/" target="_blank" rel="noopener">Открыть страницу Quad9</a> в Safari и нажать «Recommended: HTTPS (.9)». Затем Настройки → «Профиль загружен» → Установить.</span></li>
+        <li data-p="iphone"><b>Signal</b><span><a href="https://apps.apple.com/cz/app/signal-private-messenger/id874139669" target="_blank" rel="noopener">Открыть в App Store</a>, по желанию.</span></li>
+        <li data-p="iphone"><b>Tailscale</b><span><a href="https://apps.apple.com/cz/app/tailscale/id1470499037" target="_blank" rel="noopener">Открыть в App Store</a>, по желанию.</span></li>
+      </ul>
+    </article>
+  </section>
+
+  <section>
+    <h2>Сначала самое важное <span class="time">≈ 30 минут</span></h2>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-pass"><span>Менеджер паролей: у каждого сервиса свой пароль</span></label>
+      <p class="why">Если пароль один на всё, утечка на любом сайте открывает и почту, и банк.</p>
+      <ul class="how">
+        <li data-p="iphone mac"><b>iPhone, Mac</b><span>Уже встроено: приложение «Пароли». Бесплатно. На Windows работает через «iCloud для Windows».</span></li>
+        <li data-p="android windows"><b>Android, Windows</b><span>Bitwarden, бесплатный тариф: <a href="https://bitwarden.com/download/" target="_blank" rel="noopener">bitwarden.com/download</a></span></li>
+        <li class="gen">Начните с почты, банка и рабочих систем. Остальные пароли меняйте, когда заходите в сервис.</li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-2fa"><span>Вход с подтверждением на почте, в банке и рабочих системах</span></label>
+      <p class="why">Даже с украденным паролем без второго шага не войти. Почту защищайте первой: через неё восстанавливают все остальные пароли.</p>
+      <ul class="how">
+        <li class="gen">Лучше всего ключ входа (passkey), если сайт его предлагает: телефон подтверждает вход лицом или пальцем.</li>
+        <li data-p="iphone mac"><b>iPhone, Mac</b><span>Коды храните во встроенных «Паролях». В сервисе: настройки безопасности → двухэтапная проверка → «Приложение-аутентификатор», появится QR-код. На iPhone: «Пароли» → этот аккаунт → «Настроить код проверки» → «Сканировать QR-код». Дальше «Пароли» сами подставляют код при входе.</span></li>
+        <li data-p="android windows"><b>Android, Windows</b><span>Приложение с кодами: Ente Auth или 2FAS, бесплатно.</span></li>
+        <li class="gen">Коды по SMS — только если другого варианта нет. Мошенник может перевыпустить вашу SIM-карту у оператора, и коды начнут приходить ему.</li>
+        <li class="gen">Telegram: Настройки → Конфиденциальность → Облачный пароль. Без него аккаунт уводят, выманив один код из SMS. WhatsApp: Настройки → Аккаунт → Двухшаговая проверка.</li>
+        <li class="gen">Резервные коды восстановления сохраните в менеджер паролей.</li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-upd"><span>Автоматические обновления</span></label>
+      <p class="why">Большинство взломов идёт через дыры, которые в свежей версии уже закрыты.</p>
+      <ul class="how">
+        <li data-p="iphone"><b>iPhone</b><span>Настройки → Основные → Обновление ПО → Автообновление: включить всё.</span></li>
+        <li data-p="android"><b>Android</b><span>Настройки → Система → Обновление ПО (название зависит от производителя). В Google Play включите автообновление приложений.</span></li>
+        <li data-p="mac"><b>Mac</b><span>Системные настройки → Основные → Обновление ПО → ⓘ рядом с «Автоматические обновления»: включить всё.</span></li>
+        <li data-p="windows"><b>Windows</b><span>Параметры → Центр обновления Windows: обновления не откладывать.</span></li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-lock"><span>Код на телефоне и блокировка экрана</span></label>
+      <p class="why">Незапертый потерянный телефон — это открытые почта, банк и переписка с клиентами.</p>
+      <ul class="how">
+        <li data-p="iphone"><b>iPhone</b><span>Код из 6 цифр и больше, Face ID. Настройки → Экран и яркость → Автоблокировка: 30 секунд или 1 минута.</span></li>
+        <li data-p="android"><b>Android</b><span>Настройки → Безопасность: PIN из 6 цифр и больше, отпечаток. Блокировка экрана через 30 секунд или 1 минуту.</span></li>
+        <li data-p="mac"><b>Mac</b><span>Системные настройки → Экран блокировки → «Запрашивать пароль»: сразу или через 1 минуту. Уходя, нажмите Control + Command + Q.</span></li>
+        <li data-p="windows"><b>Windows</b><span>Параметры → Учётные записи → Варианты входа: PIN или Windows Hello. Уходя, нажмите Win + L.</span></li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-enc"><span>Шифрование диска</span></label>
+      <p class="why">Без шифрования данные с украденного ноутбука читаются за минуты, даже если на входе стоит пароль.</p>
+      <ul class="how">
+        <li data-p="iphone android"><b>Телефон</b><span>Шифруется сам, если стоит код. Ничего делать не нужно.</span></li>
+        <li data-p="mac"><b>Mac</b><span>Системные настройки → Конфиденциальность и безопасность → FileVault → Включить. Ключ восстановления сохраните в менеджер паролей.</span></li>
+        <li data-p="windows"><b>Windows</b><span>Параметры → Конфиденциальность и защита → Шифрование устройства (в версии Pro — BitLocker). Ключ восстановления сохраните.</span></li>
+      </ul>
+    </article>
+  </section>
+
+  <section>
+    <h2>Потом <span class="time">≈ 30 минут</span></h2>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-dns"><span>Защитный DNS: фильтр опасных сайтов</span></label>
+      <p class="why">Отсекает поддельные и заражённые сайты ещё до того, как они откроются. Работает в любой сети.</p>
+      <ul class="how">
+        <li class="gen">NextDNS: бесплатно до 300 000 запросов в месяц, одному человеку обычно хватает; Pro — $1.99 в месяц. Регистрация на <a href="https://nextdns.io" target="_blank" rel="noopener">nextdns.io</a>, дальше сайт подскажет шаги для каждого устройства.</li>
+        <li data-p="android"><b>Android</b><span>Без регистрации: Настройки → Сеть и интернет → Частный DNS → вписать <code>dns.quad9.net</code> (Quad9, бесплатно).</span></li>
+        <li data-p="iphone mac"><b>iPhone, Mac</b><span>Без регистрации: Quad9. На Mac его ставит программа установки, на iPhone — ссылка в разделе «Установка программ».</span></li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-bak"><span>Резервная копия в двух местах</span></label>
+      <p class="why">Кража, пожар или вирус-вымогатель — и файлы пропадут, если лежат в одном месте.</p>
+      <ul class="how">
+        <li data-p="mac"><b>Mac</b><span>Time Machine на внешний диск плюс iCloud Drive для «Рабочего стола» и «Документов».</span></li>
+        <li data-p="windows"><b>Windows</b><span>«История файлов» на внешний диск плюс OneDrive.</span></li>
+        <li data-p="iphone"><b>iPhone</b><span>Настройки → [ваше имя] → iCloud → Резервная копия iCloud.</span></li>
+        <li data-p="android"><b>Android</b><span>Настройки → Google → Резервное копирование.</span></li>
+        <li data-p="iphone mac"><b>Apple</b><span>Для документов клиентов включите «Расширенную защиту данных»: Настройки → [ваше имя] → iCloud. Тогда файлы не может прочитать даже Apple. Понадобится контакт или ключ восстановления.</span></li>
+        <li class="gen">Облако — это синхронизация: удалили файл у себя, он удалится и в облаке (обычно 30 дней можно вернуть). Поэтому нужен ещё и внешний диск.</li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-wifi"><span>VPN в чужом Wi-Fi</span></label>
+      <p class="why">В кафе, отеле или на вокзале владелец сети может видеть, какие сайты вы открываете.</p>
+      <ul class="how">
+        <li class="gen">Proton VPN Free: бесплатно, без лимита трафика, на одно устройство — <a href="https://protonvpn.com" target="_blank" rel="noopener">protonvpn.com</a>. Или раздайте интернет с телефона.</li>
+        <li class="gen">Дома и в офисе, где Wi-Fi с паролем, VPN не обязателен.</li>
+        <li class="gen">VPN не делает вас невидимым для сайтов, куда вы вошли, и не защищает от поддельных писем.</li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-pwn"><span>Проверка утечек</span></label>
+      <p class="why">Узнаете, если ваша почта попала во взломанную базу, и смените пароль раньше, чем им воспользуются.</p>
+      <ul class="how">
+        <li class="gen"><a href="https://haveibeenpwned.com" target="_blank" rel="noopener">haveibeenpwned.com</a> → введите почту → «Notify me», чтобы приходили уведомления. Если почта нашлась в утечке, смените пароль на том сервисе.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section>
+    <h2>Правила работы с клиентами</h2>
+    <p class="note">Ставить ничего не нужно, отметьте, когда начали так делать.</p>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-docs"><span>Документы клиентов — только в рабочих системах</span></label>
+      <p class="why">Сканы паспортов и выписок из галереи и чатов уходят в облачные копии и лежат там годами.</p>
+      <ul class="how">
+        <li class="gen">Храните документы клиентов в рабочих системах компании. Не на рабочем столе «временно» и не в галерее телефона.</li>
+        <li class="gen">Отправить файл — ссылкой с паролем и сроком действия (например, Proton Drive, бесплатно). Пароль сообщите отдельно: в SMS или звонком.</li>
+        <li class="gen">Для переписки с чувствительными подробностями — Signal (бесплатно).</li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-phish"><span>Срочность и деньги — повод остановиться</span></label>
+      <p class="why">Чаще всего крадут без взлома: после звонка или письма человек сам отдаёт код или деньги.</p>
+      <ul class="how">
+        <li class="gen">Банк, полиция и «служба безопасности» никогда не просят код из SMS, пароль или перевод «на безопасный счёт».</li>
+        <li class="gen">Ссылки из писем и SMS про оплату, посылку или блокировку не открывайте. Заходите в сервис сами, через закладку или приложение.</li>
+        <li class="gen">Срочность, деньги и «никому не говорите» вместе — почти всегда мошенничество. Положите трубку и перезвоните по официальному номеру.</li>
+      </ul>
+    </article>
+
+    <article class="item">
+      <label class="head"><input type="checkbox" id="c-ai"><span>ChatGPT и другие ИИ-чаты — без данных клиентов</span></label>
+      <p class="why">Всё, что вы вставляете в чат, хранится у сервиса. На личных тарифах переписка по умолчанию может идти на обучение моделей.</p>
+      <ul class="how">
+        <li class="gen">Не вставляйте имена, rodné číslo, номера счетов, договоры и сканы. Пишите обезличенно, например: «клиент А, 35 лет, доход 60 000 Kč».</li>
+        <li class="gen">Настройки → Управление данными (Data controls) → «Улучшить модель для всех» (Improve the model for everyone): выключить.</li>
+        <li class="gen">Настройки → Безопасность (Security) → многофакторная аутентификация: включить. Код храните в «Паролях», как в шаге про вход с подтверждением.</li>
+        <li class="gen">Для разовых вопросов — «Временный чат»: он не сохраняется в истории и не идёт на обучение.</li>
+        <li class="gen">У личных тарифов (Free, Plus, Pro) нет договора об обработке данных по GDPR. Для работы с данными клиентов нужен рабочий тариф компании с таким договором, например ChatGPT Business.</li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="alert">
+    <h2>Если что-то случилось</h2>
+    <ul class="plain">
+      <li><strong>Потеряли телефон или ноутбук.</strong> Заблокируйте удалённо: icloud.com/find (Apple), android.com/find (Android), account.microsoft.com/devices (Windows). Затем смените пароль от почты.</li>
+      <li><strong>Ввели пароль на подозрительном сайте.</strong> Сразу смените его там и на почте, в настройках аккаунта выйдите со всех устройств.</li>
+      <li><strong>Данные клиента ушли не туда.</strong> Сразу сообщите в компанию. По GDPR о такой утечке нужно уведомить ÚOOÚ в течение 72 часов, поэтому важен каждый час.</li>
+      <li><strong>Звонят «из банка».</strong> Положите трубку и перезвоните по номеру на обороте карты.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Что не нужно</h2>
+    <ul class="plain">
+      <li>Платный антивирус: на Windows хватает встроенной «Безопасности Windows», на Mac — встроенной защиты.</li>
+      <li>«Чистильщики» и «ускорители» системы.</li>
+      <li>Бесплатные VPN неизвестных компаний: часто зарабатывают на продаже ваших данных.</li>
+      <li>Расширения браузера «для безопасности» из рекламы.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>Список проверен 7 ноября 2026, программа установки и помощник для ChatGPT — 12 ноября 2026. Цены указаны как на сайтах сервисов; в Чехии они могут показываться в кронах.</p>
+    <p>Вопросы задавайте тому, кто прислал эту ссылку.</p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  var KEY = 'cifrovaya-zashchita-v1';
+  var state = { checks: {}, f: 'all' };
+  try { var saved = JSON.parse(localStorage.getItem(KEY)); if (saved) state = Object.assign(state, saved); } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  var boxes = document.querySelectorAll('.item input[type=checkbox]');
+  var buttons = document.querySelectorAll('.filter button');
+  var rows = document.querySelectorAll('.how li[data-p]');
+
+  function progress() {
+    var done = 0;
+    boxes.forEach(function (b) { if (b.checked) done++; });
+    document.getElementById('bar').style.width = (done / boxes.length * 100) + '%';
+    document.getElementById('count').textContent = 'Сделано ' + done + ' из ' + boxes.length;
+  }
+  function filter(f) {
+    state.f = f;
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.f === f)); });
+    rows.forEach(function (li) { li.hidden = f !== 'all' && li.dataset.p.split(' ').indexOf(f) < 0; });
+  }
+
+  boxes.forEach(function (b) {
+    b.checked = !!state.checks[b.id];
+    b.addEventListener('change', function () { state.checks[b.id] = b.checked; save(); progress(); });
+  });
+  buttons.forEach(function (b) { b.addEventListener('click', function () { filter(b.dataset.f); save(); }); });
+  filter(state.f);
+  progress();
+
+  document.querySelectorAll('[data-copy]').forEach(function (copy) {
+    var src = document.getElementById(copy.dataset.copy);
+    src.addEventListener('focus', function () { src.select(); });
+    copy.addEventListener('click', function () {
+      src.select();
+      (navigator.clipboard ? navigator.clipboard.writeText(src.value) : Promise.reject())
+        .then(function () { copy.textContent = 'Скопировано'; }, function () { copy.textContent = 'Нажмите Command + C'; });
+    });
+  });
+})();
+</script>
+</body>
+</html>
